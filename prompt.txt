@@ -1,0 +1,21 @@
+Please process the document I provide in strict accordance with the following requirements, and return only the final dictionary without any extra explanation or comment:
+Extract the core table of contents from the document (keep it concise, first-level sections only).
+Generate a concise and accurate summary of the document.
+Combine the table of contents and summary into Markdown format, structured as:
+Table of Contents
+...
+Summary
+...
+Produce four versions: Chinese (cn), English (en), Japanese (ja), Korean (ko).
+Return the result only as a dictionary in the following format:
+{
+"cn": "Chinese Markdown content",
+"en": "English Markdown content",
+"ja": "Japanese Markdown content",
+"ko": "Korean Markdown content"
+}
+Rules:
+Translate naturally and accurately, following local language habits.
+Do not add subjective opinions or extra information.
+Strictly follow the format; do not change keys or structure.
+Now process the document:
