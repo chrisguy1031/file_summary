@@ -1,4 +1,5 @@
 from fastapi import APIRouter, UploadFile, status, Form, File
+import time
 
 from file_controller import file_controller as controller
 from file_schema import *
@@ -9,10 +10,11 @@ router = APIRouter(prefix="/api/v1", tags=["File Service"])
 async def handle_upload_files(
     files: list[UploadFile] = File(..., description="要上传的文件列表"),
     app_id: int = Form(..., description="应用ID"),
-    app_user: str = Form(..., description="应用用户名"),
-    batch: str = Form(..., description="批次名称")
+    app_user: str = Form(..., description="应用用户名")
 ):
     """上传一个或多个文件到指定的知识库。"""
+    # 生成批次名称，使用当前时间戳字符串
+    batch = str(time.time())
     metadata = UploadMetadata(
         app_id=app_id,
         app_user=app_user,
