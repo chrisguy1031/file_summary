@@ -2,23 +2,23 @@ import oci
 import json
 import asyncio
 from typing import Any
-from pydantic import Field
+from pydantic import Field, BaseModel
 from loguru import logger
 
 
 
-class OCILLMConfig:
+class OCILLMConfig(BaseModel):
     """OCI LLM客户端配置"""
-    model_name: str = Field(..., description="模型名称")
-    max_tokens: int = Field(8192, description="最大令牌数")
-    temperature: float | None = Field(None, ge=0, le=2, description="温度参数，控制输出随机性")
-    top_p: float | None = Field(None, ge=0, le=1, description="Top-p 采样参数")
-    top_k: int | None = Field(None, ge=0, description="Top-k 采样参数")
-    frequency_penalty: float | None = Field(None, ge=-2, le=2, description="频率惩罚参数")
-    presence_penalty: float | None = Field(None, ge=-2, le=2, description="存在惩罚参数")
-    api_endpoint: str = Field(..., description="OCI Generative AI Endpoint")
-    compartment_id: str = Field(..., description="OCI Compartment OCID")
-    config_file: dict | str = Field(..., description="OCI Auth Config (dict or JSON string)")
+    model_name: str
+    max_tokens: int = 8192
+    temperature: float | None = None
+    top_p: float | None = None
+    top_k: int | None = None
+    frequency_penalty: float | None = None
+    presence_penalty: float | None = None
+    api_endpoint: str
+    compartment_id: str
+    config_file: dict | str
 
 class OCIClient:
     """
@@ -77,20 +77,12 @@ class OCIClient:
         """根据模型类型构建特定的请求对象"""
         model_name = self.config.model_name.lower()
         
-        # 基础参数提取（确保数值类型正确）
-        # 从config对象中获取实际值而不是FieldInfo对象
-        config_values = {
-            'max_tokens': getattr(self.config, 'max_tokens', 8192),
-            'temperature': getattr(self.config, 'temperature', None),
-            'top_p': getattr(self.config, 'top_p', None),
-            'top_k': getattr(self.config, 'top_k', None),
-        }
-        
+        # 基础参数提取（现在self.config是Pydantic模型实例）
         params = {
-            "max_tokens": int(kwargs.get('max_tokens', config_values['max_tokens'])),
-            "temperature": float(kwargs.get('temperature', config_values['temperature'])) if kwargs.get('temperature', config_values['temperature']) is not None else None,
-            "top_p": float(kwargs.get('top_p', config_values['top_p'])) if kwargs.get('top_p', config_values['top_p']) is not None else None,
-            "top_k": int(kwargs.get('top_k', config_values['top_k'])) if kwargs.get('top_k', config_values['top_k']) is not None else None,
+            "max_tokens": int(kwargs.get('max_tokens', self.config.max_tokens)),
+            "temperature": float(kwargs.get('temperature', self.config.temperature)) if kwargs.get('temperature', self.config.temperature) is not None else None,
+            "top_p": float(kwargs.get('top_p', self.config.top_p)) if kwargs.get('top_p', self.config.top_p) is not None else None,
+            "top_k": int(kwargs.get('top_k', self.config.top_k)) if kwargs.get('top_k', self.config.top_k) is not None else None,
         }
 
         # 1. Cohere 模型适配
