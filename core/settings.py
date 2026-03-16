@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     
     # 环境配置 - 支持环境变量覆盖
     environment: str = "development"
-    config_dir: str = "../configuration"
+    config_dir: str = "../"
     
     # 各模块配置
     app: AppConfig = AppConfig()

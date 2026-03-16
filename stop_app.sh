@@ -79,4 +79,4 @@ for PID in $PIDS; do
     fi
 done
 
-echo "所有 KM Portal 服务关闭完成。"
+echo "所有 File Summary 服务关闭完成。"
