@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, status, Form, File
 
-from .file_controller import file_controller as controller
-from .file_schema import *
+from file_controller import file_controller as controller
+from file_schema import *
 
 router = APIRouter(prefix="/api/v1", tags=["File Service"])
 
