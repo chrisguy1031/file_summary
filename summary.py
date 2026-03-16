@@ -8,6 +8,12 @@ from dao.file_repo import FileSummaryRepository
 from oci_client import OCIClient, OCILLMConfig
 from core.settings import get_app_config
 
+import fitz  # PyMuPDF
+from docx import Document
+import openpyxl
+from pptx import Presentation
+
+
 
 class FileSummaryService:
 
@@ -31,10 +37,9 @@ class FileSummaryService:
             for file in files:
                 # 获取文件内容
                 try:
-                    with open(file.file_path, 'r', encoding='utf-8') as f:
-                        file_content = f.read().strip()
+                    file_content = self._get_file_content(file.file_path)
                 except Exception as e:
-                    logger.error(f"读取文件 {file.file_path} 失败: {e}")
+                    logger.error(f"解析文件 {file.file_path} 失败: {e}")
                     continue
                 
                 # 获取摘要提取提示
@@ -120,6 +125,45 @@ class FileSummaryService:
                     kwargs = {"status": 3}
                     await file_repo.update(file.file_id, **kwargs)
 
+    def _get_file_content(self, file_path):
+        ext = file_path.split('.')[-1].lower()
+        
+        # 1. 处理 PDF
+        if ext == 'pdf':
+            text = ""
+            with fitz.open(file_path) as doc:
+                for page in doc:
+                    text += page.get_text()
+            return text.strip()
+
+        # 2. 处理 Word (.docx)
+        elif ext == 'docx':
+            doc = Document(file_path)
+            return "\n".join([para.text for para in doc.paragraphs]).strip()
+
+        # 3. 处理 Excel (.xlsx)
+        elif ext == 'xlsx':
+            wb = openpyxl.load_model(file_path, data_only=True)
+            content = []
+            for sheet in wb.worksheets:
+                for row in sheet.iter_rows(values_only=True):
+                    content.append(" ".join([str(cell) for cell in row if cell is not None]))
+            return "\n".join(content).strip()
+
+        # 4. 处理 PPT (.pptx)
+        elif ext == 'pptx':
+            prs = Presentation(file_path)
+            text_runs = []
+            for slide in prs.slides:
+                for shape in slide.shapes:
+                    if hasattr(shape, "text"):
+                        text_runs.append(shape.text)
+            return "\n".join(text_runs).strip()
+        
+        # 5. 默认处理文本 (txt, md)
+        else:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                return f.read().strip()
 
     async def _get_model(self) -> OCIClient:
         """获取模型实例"""
