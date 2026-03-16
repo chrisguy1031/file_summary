@@ -2,8 +2,8 @@ from fastapi import UploadFile, HTTPException
 from fastapi.responses import FileResponse
 from pathlib import Path
 from loguru import logger
-from .file_service import FileService
-from .file_schema import UploadMetadata, SuccessResponse
+from file_service import FileService
+from file_schema import UploadMetadata, SuccessResponse
 
 
 class FileController:
