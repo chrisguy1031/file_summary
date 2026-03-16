@@ -77,12 +77,12 @@ class OCIClient:
         """根据模型类型构建特定的请求对象"""
         model_name = self.config.model_name.lower()
         
-        # 基础参数提取
+        # 基础参数提取（确保数值类型正确）
         params = {
-            "max_tokens": kwargs.get('max_tokens', self.config.max_tokens),
-            "temperature": kwargs.get('temperature', self.config.temperature),
-            "top_p": kwargs.get('top_p', self.config.top_p),
-            "top_k": kwargs.get('top_k', self.config.top_k),
+            "max_tokens": int(kwargs.get('max_tokens', self.config.max_tokens)),
+            "temperature": float(kwargs.get('temperature', self.config.temperature)) if kwargs.get('temperature', self.config.temperature) is not None else None,
+            "top_p": float(kwargs.get('top_p', self.config.top_p)) if kwargs.get('top_p', self.config.top_p) is not None else None,
+            "top_k": int(kwargs.get('top_k', self.config.top_k)) if kwargs.get('top_k', self.config.top_k) is not None else None,
         }
 
         # 1. Cohere 模型适配

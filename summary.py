@@ -190,7 +190,7 @@ class FileSummaryService:
         model_config.model_name = model.model_name
         model_config.api_endpoint = endpoint
         model_config.config_file = config_file
-        model_config.max_tokens = model_param.get("max_tokens", 8192)
+        model_config.max_tokens = int(model_param.get("max_tokens", 8192))
         model_config.compartment_id = compartment_id
 
         # 创建模型客户端
