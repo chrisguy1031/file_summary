@@ -23,7 +23,7 @@ get_service_pid() {
 declare -A PID_MAP  # 使用关联数组来去重
 
 # 获取主程序PID（确保只在当前项目目录下运行的那个）
-MAIN_PIDS=$(get_service_pid "${SERVICE_ROOT}" "app_main.py")
+MAIN_PIDS=$(get_service_pid "${SERVICE_ROOT}" "main.py")
 if [ -n "$MAIN_PIDS" ]; then
     while read pid; do
         if [ -n "$pid" ]; then
@@ -33,28 +33,10 @@ if [ -n "$MAIN_PIDS" ]; then
     done <<< "$MAIN_PIDS"
 fi
 
-# 获取各个微服务的PID（现在都在项目根目录下）
-MICROSERVICES=(
-    "app_llm.py" 
-    "app_vlm.py"
-    "app_parser.py"
-)
-
-for service_script in "${MICROSERVICES[@]}"; do
-    SERVICE_PIDS=$(get_service_pid "${SERVICE_ROOT}" "${service_script}")
-    if [ -n "$SERVICE_PIDS" ]; then
-        while read pid; do
-            if [ -n "$pid" ]; then
-                PID_MAP["$pid"]=1
-                echo "找到${service_script}微服务进程: $pid"
-            fi
-        done <<< "$SERVICE_PIDS"
-    fi
-done
 
 # 检查是否有进程需要关闭
 if [ ${#PID_MAP[@]} -eq 0 ]; then
-    echo "没有找到运行中的 KM Portal 服务。"
+    echo "没有找到运行中的 File Summary 服务。"
     exit 0
 fi
 
