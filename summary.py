@@ -186,12 +186,15 @@ class FileSummaryService:
         if not config_file or not compartment_id:
             raise Exception(f"模型 {model_name} 配置文件不存在")
         
-        model_config = OCILLMConfig()
-        model_config.model_name = model.model_name
-        model_config.api_endpoint = endpoint
-        model_config.config_file = config_file
-        model_config.max_tokens = int(model_param.get("max_tokens", 8192))
-        model_config.compartment_id = compartment_id
+        # 创建 Pydantic 模型实例时传入所有必需参数
+        model_config = OCILLMConfig(
+            model_name=model.model_name,
+            api_endpoint=endpoint,
+            config_file=config_file,
+            compartment_id=compartment_id,
+            max_tokens=int(model_param.get("max_tokens", 8192)),
+            temperature=float(model_param.get("temperature")) if model_param.get("temperature") else None
+        )
 
         # 创建模型客户端
         client = OCIClient(model_config)
