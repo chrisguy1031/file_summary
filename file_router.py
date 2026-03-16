@@ -25,3 +25,8 @@ async def handle_upload_files(
 async def handle_remove_file(file_ids: list[str] = Form(..., description="要删除的文件ID列表")):
     """从指定的知识库中删除文件。"""
     await controller.remove_file(file_ids)
+
+@router.post("/summary", status_code=status.HTTP_202_ACCEPTED, summary="为指定的文件生成摘要")
+async def handle_summary_file(file_ids: list[str] = Form(..., description="要生成摘要的文件ID列表")):
+    """为指定的文件生成摘要。"""
+    await controller.summary_file(file_ids)

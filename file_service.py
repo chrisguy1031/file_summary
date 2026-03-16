@@ -95,7 +95,7 @@ class FileService:
             
             # 构造 file 的实体列表用于批量保存到数据库
             file_list = []
-            for fileparam in fileparams:
+            for idx, fileparam in enumerate(fileparams, start=1):
                 # 构造文件实体
                 file = FileSummary(
                     file_id = str(uuid.uuid4()),
@@ -106,6 +106,7 @@ class FileService:
                     file_name = fileparam["file_name"],
                     file_ext = fileparam["file_ext"],
                     file_size = fileparam["file_size"],
+                    file_seq = idx,
                     status=FileStatus.UPLOADED.value
                 )
                 file_list.append(file)
