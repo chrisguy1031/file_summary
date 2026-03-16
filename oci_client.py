@@ -78,11 +78,19 @@ class OCIClient:
         model_name = self.config.model_name.lower()
         
         # 基础参数提取（确保数值类型正确）
+        # 从config对象中获取实际值而不是FieldInfo对象
+        config_values = {
+            'max_tokens': getattr(self.config, 'max_tokens', 8192),
+            'temperature': getattr(self.config, 'temperature', None),
+            'top_p': getattr(self.config, 'top_p', None),
+            'top_k': getattr(self.config, 'top_k', None),
+        }
+        
         params = {
-            "max_tokens": int(kwargs.get('max_tokens', self.config.max_tokens)),
-            "temperature": float(kwargs.get('temperature', self.config.temperature)) if kwargs.get('temperature', self.config.temperature) is not None else None,
-            "top_p": float(kwargs.get('top_p', self.config.top_p)) if kwargs.get('top_p', self.config.top_p) is not None else None,
-            "top_k": int(kwargs.get('top_k', self.config.top_k)) if kwargs.get('top_k', self.config.top_k) is not None else None,
+            "max_tokens": int(kwargs.get('max_tokens', config_values['max_tokens'])),
+            "temperature": float(kwargs.get('temperature', config_values['temperature'])) if kwargs.get('temperature', config_values['temperature']) is not None else None,
+            "top_p": float(kwargs.get('top_p', config_values['top_p'])) if kwargs.get('top_p', config_values['top_p']) is not None else None,
+            "top_k": int(kwargs.get('top_k', config_values['top_k'])) if kwargs.get('top_k', config_values['top_k']) is not None else None,
         }
 
         # 1. Cohere 模型适配
