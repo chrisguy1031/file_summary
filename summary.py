@@ -113,13 +113,17 @@ class FileSummaryService:
                             else:
                                 logger.warning(f"文件 {file.file_name} 摘要格式不完整: {result}")
                         except json.JSONDecodeError:
-                            # 如果不是JSON格式，直接保存原始内容
+                            # 如果不是JSON格式，解析多语言Markdown内容
+                            summaries = self._parse_multilingual_summary(result)
                             kwargs = {
-                                    "summary_en": result,
-                                    "status": 2
-                                }
+                                "summary_cn": summaries.get("cn", ""),
+                                "summary_en": summaries.get("en", ""),
+                                "summary_ja": summaries.get("ja", ""),
+                                "summary_kr": summaries.get("ko", ""),
+                                "status": 2
+                            }
                             await file_repo.update(file.file_id, **kwargs)
-                            logger.warning(f"文件 {file.file_name} 摘要生成成功（非JSON格式）")
+                            logger.info(f"文件 {file.file_name} 摘要生成成功（多语言Markdown格式）")
                 except Exception as e:
                     logger.error(f"文件 {file.file_name} 摘要生成失败: {e}")
                     kwargs = {"status": 3}
@@ -205,6 +209,44 @@ class FileSummaryService:
 
         return await client.chat(prompt)
     
+
+    def _parse_multilingual_summary(self, content: str) -> dict[str, str]:
+        """解析多语言Markdown摘要内容"""
+        summaries = {"cn": "", "en": "", "ja": "", "ko": ""}
+        
+        # 定义语言标识符
+        language_headers = {
+            "cn": ["# 目录", "# 摘要"],
+            "en": ["# Table of Contents", "# Summary"],
+            "ja": ["# 目次", "# 要約"],
+            "ko": ["# 목차", "# 요약"]
+        }
+        
+        current_lang = None
+        lines = content.split('\n')
+        current_content = []
+        
+        for line in lines:
+            # 检查是否为语言标题
+            for lang, headers in language_headers.items():
+                if any(line.strip().startswith(header) for header in headers):
+                    # 保存上一个语言的内容
+                    if current_lang and current_content:
+                        summaries[current_lang] = '\n'.join(current_content).strip()
+                    # 开始新的语言
+                    current_lang = lang
+                    current_content = [line]
+                    break
+            else:
+                # 如果不是标题行，添加到当前语言内容
+                if current_lang:
+                    current_content.append(line)
+        
+        # 保存最后一个语言的内容
+        if current_lang and current_content:
+            summaries[current_lang] = '\n'.join(current_content).strip()
+        
+        return summaries
 
     def _get_prompt(self, file_content: str) -> str:
         """获取摘要提取提示"""
