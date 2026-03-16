@@ -192,28 +192,25 @@ class FileService:
             # 其他异常情况需要记录警告
             logger.warning(f"删除batch文件夹 {batch_folder} 失败: {e}")
 
-    async def delete_file_service(
-            self,
-            file_ids: list[str]
-        ):
+    async def delete_file_service(self, batch: str):
         """
         文件删除服务
         
         Args:
-            file_ids: 文件ID列表(用于特定文件删除)
+            batch: 批次名称
         """
         async with self.db_session as session:
             file_repo = FileSummaryRepository(session)
-            logger.info(f"开始删除 {len(file_ids)} 个文件")
+            logger.info(f"开始删除批次 {batch} 下的文件")
             # 1. 获取文件路径
             try:
-                file_list = await file_repo.get_by_ids(file_ids)
+                file_list = await file_repo.get_by_batch(batch)
             except Exception as e:
                 raise InternalServerError(f"获取文件路径失败: {e}")
             
             # 2. 删除文件的元数据
             try:
-                await file_repo.delete_batch(file_ids)
+                await file_repo.delete_batch(batch)
             except DatabaseException as e:
                 logger.error(e.original_error or e.message)
                 raise InternalServerError(e.message)

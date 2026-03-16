@@ -50,8 +50,15 @@ class FileSummaryRepository():
         except Exception as e:
             raise Exception(f"删除文件信息失败: {str(e)}")
         
-    async def delete_batch(self, file_id_list: list[str]):
+    async def delete_batch(self, batch: str):
         try:
-            await self.db_session.execute(delete(FileSummary).where(FileSummary.file_id.in_(file_id_list)))
+            await self.db_session.execute(delete(FileSummary).where(FileSummary.batch == batch))
         except Exception as e:
             raise Exception(f"批量删除文件信息失败: {str(e)}")
+        
+    async def get_by_batch(self, batch: str):
+        try:
+            result = await self.db_session.execute(select(FileSummary).where(FileSummary.batch==batch))
+            return result.scalars().all()
+        except Exception as e:
+            raise Exception(f"查询文件信息失败: {str(e)}")

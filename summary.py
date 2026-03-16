@@ -21,13 +21,13 @@ class FileSummaryService:
     def db_session(self):
         return get_session()
 
-    async def summary(self, file_ids: list[str]):
+    async def summary(self, batch: str):
         """文件摘要服务"""
         async with self.db_session as session:
             file_repo = FileSummaryRepository(db_session=session)
-            files = await file_repo.get_by_ids(file_ids)
+            files = await file_repo.get_by_batch(batch)
             if not files:
-                raise Exception(f"文件 {file_ids} 不存在")
+                raise Exception(f"批次 {batch} 下不存在文件")
             
             # 获取模型客户端
             client = await self._get_model()

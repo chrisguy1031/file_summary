@@ -24,13 +24,13 @@ class FileController:
         return SuccessResponse(message="文件上传成功")
                                
 
-    async def remove_file(self, file_ids: list[str]):
+    async def remove_file(self, batch: str):
         """从知识库中删除文件"""
-        await self.file_service.delete_file_service(file_ids=file_ids)
+        await self.file_service.delete_file_service(batch=batch)
 
-    async def summary_file(self, file_ids: list[str]):
+    async def summary_file(self, batch: str):
         """文件摘要服务"""
-        await self.summary_service.summary(file_ids=file_ids)
+        await self.summary_service.summary(batch=batch)
 
     
 file_controller = FileController()
