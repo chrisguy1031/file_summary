@@ -147,7 +147,7 @@ class FileSummaryService:
 
         # 3. 处理 Excel (.xlsx)
         elif ext == 'xlsx':
-            wb = openpyxl.load_model(file_path, data_only=True)
+            wb = openpyxl.load_workbook(file_path, data_only=True)
             content = []
             for sheet in wb.worksheets:
                 for row in sheet.iter_rows(values_only=True):
