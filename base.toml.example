@@ -1,0 +1,34 @@
+# core/config/base.toml
+[app]
+service_name = "main-service"
+service_version = "3.0.0"
+service_host = "0.0.0.0"
+service_port = 16099
+title = "KBOT"
+description = "KBot API Service"
+debug = true
+file_storage = "/home/chris/kbot3/knowledge_base"
+llm_model = "xai.grok-3"
+
+[app.log]
+level = "DEBUG"
+dir = "/home/chris/kbot3/logs/"
+rotation = "100 MB"
+retention = "10 days"
+api_log_enabled = true
+
+[oracle]
+username = "kbot"
+password = "oracle"
+host = "localhost"
+port = 1521
+service_name = "kbotdev"
+
+[sqlalchemy]
+echo = false
+pool_size = 10
+pool_timeout = 60
+max_overflow = 20
+pool_pre_ping = true
+pool_use_lifo = true
+pool_recycle = 1800
