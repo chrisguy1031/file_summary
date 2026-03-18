@@ -77,7 +77,7 @@ class OCIClient:
         """根据模型类型构建特定的请求对象"""
         model_name = self.config.model_name.lower()
         
-        # 基础参数提取（现在self.config是Pydantic模型实例）
+        # 基础参数提取（确保类型正确）
         params = {
             "max_tokens": int(kwargs.get('max_tokens', self.config.max_tokens)),
             "temperature": float(kwargs.get('temperature', self.config.temperature)) if kwargs.get('temperature', self.config.temperature) is not None else None,
